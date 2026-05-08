@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="mb-4">Rooms</h1>
+
+<div class="row">
+
+    {% for room in rooms %}
+
+        <div class="col-md-4 mb-4">
+
+            <div class="card h-100">
+
+                {% if room.images.first %}
+                    <img src="{{ room.images.first.image.url }}"
+                         class="card-img-top"
+                         style="height:250px; object-fit:cover;">
+                {% endif %}
+
+                <div class="card-body">
+
+                    <h5>{{ room.title }}</h5>
+
+                    <p>{{ room.description|truncatewords:15 }}</p>
+
+                    <p><strong>Price:</strong> ${{ room.price }}</p>
+
+                    <p><strong>Capacity:</strong> {{ room.capacity }}</p>
+
+                    <a href="{% url 'room_detail' room.id %}"
+                       class="btn btn-primary">
+                        Details
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

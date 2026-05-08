@@ -1,0 +1,7 @@
+from django.contrib import admin
+from .models import Room, RoomImage, Booking
+
+
+admin.site.register(Room)
+admin.site.register(RoomImage)
+admin.site.register(Booking)
