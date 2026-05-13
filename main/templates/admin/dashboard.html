@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="mb-4">Admin Dashboard</h1>
+<a href="{% url 'home' %}" class="btn btn-secondary mb-4">
+    Back to Home
+</a>
+
+<div class="row">
+
+    <div class="col-md-4">
+        <div class="card shadow p-4 text-center">
+            <h3>{{ rooms_count }}</h3>
+            <p>Rooms</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow p-4 text-center">
+            <h3>{{ bookings_count }}</h3>
+            <p>Bookings</p>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow p-4 text-center">
+            <h3>{{ users_count }}</h3>
+            <p>Users</p>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-4 d-flex gap-2">
+
+    <a href="{% url 'admin_rooms' %}"
+       class="btn btn-dark">
+        Rooms
+    </a>
+
+    <a href="{% url 'admin_bookings' %}"
+       class="btn btn-primary">
+        Bookings
+    </a>
+
+    <a href="{% url 'admin_users' %}"
+       class="btn btn-success">
+        Users
+    </a>
+
+</div>
+
+{% endblock %}

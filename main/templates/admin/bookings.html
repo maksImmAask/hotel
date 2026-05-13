@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h1 class="fw-bold">
+                Bookings Management
+            </h1>
+
+            <p class="text-muted">
+                Manage hotel bookings and confirmations
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow border-0">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>User</th>
+                            <th>Room</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>Status</th>
+                            <th width="260">Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for booking in bookings %}
+
+                            <tr>
+
+                                <td class="fw-semibold">
+                                    {{ booking.user.username }}
+                                </td>
+
+                                <td>
+                                    {{ booking.room.title }}
+                                </td>
+
+                                <td>
+                                    {{ booking.check_in }}
+                                </td>
+
+                                <td>
+                                    {{ booking.check_out }}
+                                </td>
+
+                                <td>
+
+                                    {% if booking.status == 'confirmed' %}
+
+                                        <span class="badge bg-success">
+                                            Confirmed
+                                        </span>
+
+                                    {% elif booking.status == 'pending' %}
+
+                                        <span class="badge bg-warning text-dark">
+                                            Pending
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-danger">
+                                            Cancelled
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    <div class="d-flex gap-2 flex-wrap">
+
+                                        {% if booking.status != 'confirmed' %}
+
+                                            <a href="{% url 'admin_confirm_booking' booking.id %}"
+                                               class="btn btn-success btn-sm">
+                                                Confirm
+                                            </a>
+
+                                        {% else %}
+
+                                            <button class="btn btn-secondary btn-sm" disabled>
+                                                Already Confirmed
+                                            </button>
+
+                                        {% endif %}
+
+                                        {% if booking.status != 'cancelled' %}
+
+                                            <a href="{% url 'admin_cancel_booking_panel' booking.id %}"
+                                               class="btn btn-danger btn-sm">
+                                                Cancel
+                                            </a>
+
+                                        {% else %}
+
+                                            <button class="btn btn-secondary btn-sm" disabled>
+                                                Cancelled
+                                            </button>
+
+                                        {% endif %}
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

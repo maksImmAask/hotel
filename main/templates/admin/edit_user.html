@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-4">
+
+                    <h2 class="fw-bold mb-4">
+                        Edit User
+                    </h2>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Username
+                            </label>
+
+                            <input type="text"
+                                   name="username"
+                                   value="{{ user_item.username }}"
+                                   class="form-control">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input type="email"
+                                   name="email"
+                                   value="{{ user_item.email }}"
+                                   class="form-control">
+
+                        </div>
+
+                        <div class="form-check mb-4">
+
+                            <input type="checkbox"
+                                   name="is_staff"
+                                   class="form-check-input"
+                                   {% if user_item.is_staff %}checked{% endif %}>
+
+                            <label class="form-check-label">
+                                Admin Access
+                            </label>
+
+                        </div>
+
+                        <button class="btn btn-primary">
+                            Save Changes
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

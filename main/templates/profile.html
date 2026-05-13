@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>My bookings</h1>
+
+<table class="table table-bordered mt-4">
+
+    <tr>
+        <th>Room</th>
+        <th>Check in</th>
+        <th>Check out</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+
+    {% for booking in bookings %}
+
+        <tr>
+            <td>{{ booking.room.title }}</td>
+            <td>{{ booking.check_in }}</td>
+            <td>{{ booking.check_out }}</td>
+            <td>{{ booking.status }}</td>
+
+            <td>
+                {% if booking.status != 'cancelled' %}
+
+                    <a href="{% url 'cancel_booking' booking.id %}"
+                       class="btn btn-danger btn-sm">
+                        Cancel
+                    </a>
+
+                {% endif %}
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+</table>
+
+{% endblock %}

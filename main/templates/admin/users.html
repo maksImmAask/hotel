@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="fw-bold">Users Management</h1>
+            <p class="text-muted">
+                Manage users and permissions
+            </p>
+        </div>
+
+        <a href="{% url 'admin_create_user' %}"
+           class="btn btn-success">
+            + Add User
+        </a>
+
+    </div>
+
+    <div class="card shadow border-0">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Password Hash</th>
+                            <th>Staff</th>
+                            <th>Date Joined</th>
+                            <th width="220">Actions</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for user_item in users %}
+
+                            <tr>
+
+                                <td>{{ user_item.id }}</td>
+
+                                <td class="fw-semibold">
+                                    {{ user_item.username }}
+                                </td>
+
+                                <td>
+                                    {{ user_item.email }}
+                                </td>
+
+                                <td style="max-width: 250px;">
+                                    <small class="text-muted">
+                                        {{ user_item.password|truncatechars:35 }}
+                                    </small>
+                                </td>
+
+                                <td>
+
+                                    {% if user_item.is_staff %}
+
+                                        <span class="badge bg-success">
+                                            Admin
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge bg-secondary">
+                                            User
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ user_item.date_joined|date:"d.m.Y" }}
+                                </td>
+
+                                <td>
+
+                                    <div class="d-flex gap-2">
+
+                                        <a href="{% url 'admin_edit_user' user_item.id %}"
+                                           class="btn btn-primary btn-sm">
+                                            Edit
+                                        </a>
+
+                                        <a href="{% url 'admin_delete_user' user_item.id %}"
+                                           class="btn btn-danger btn-sm">
+                                            Delete
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
