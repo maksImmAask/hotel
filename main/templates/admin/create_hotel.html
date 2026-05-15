@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card border-0 shadow">
+
+                <div class="card-body p-4">
+
+                    <h2 class="fw-bold mb-4">
+                        Create Hotel
+                    </h2>
+
+                    <form method="POST"
+                          enctype="multipart/form-data">
+
+                        {% csrf_token %}
+
+                        {{ form.as_p }}
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Hotel Image
+                            </label>
+
+                            <input type="file"
+                                   name="image"
+                                   class="form-control">
+
+                        </div>
+
+                        <button class="btn btn-success">
+                            Create Hotel
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

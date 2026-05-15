@@ -6,105 +6,113 @@
 
     <div class="row justify-content-center">
 
-        <div class="col-md-8">
+        <div class="col-md-9">
 
-            <div class="card shadow border-0">
+            <div class="card shadow border-0 rounded-4">
 
                 <div class="card-body p-4">
 
-                    <h1 class="mb-4 fw-bold">
-                        Create Room
-                    </h1>
+                    <h2 class="mb-4 fw-bold">Create Room</h2>
 
-                    <form method="POST"
-                          enctype="multipart/form-data">
-
+                    <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
 
+                        <!-- HOTEL -->
                         <div class="mb-3">
+                            <label class="form-label fw-semibold">Hotel</label>
+                            {{ form.hotel }}
+                        </div>
 
-                            <label class="form-label">
-                                Title
-                            </label>
-
+                        <!-- TITLE -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Title</label>
                             {{ form.title }}
-
                         </div>
 
+                        <!-- DESCRIPTION -->
                         <div class="mb-3">
-
-                            <label class="form-label">
-                                Description
-                            </label>
-
+                            <label class="form-label fw-semibold">Description</label>
                             {{ form.description }}
-
                         </div>
 
+                        <!-- TYPE + RATING -->
                         <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Room Type</label>
+                                {{ form.room_type }}
+                            </div>
 
                             <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Rating</label>
+                                {{ form.rating }}
+                            </div>
+                        </div>
 
-                                <label class="form-label">
-                                    Price
-                                </label>
-
+                        <!-- PRICE + CAPACITY -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Price per night</label>
                                 {{ form.price }}
-
                             </div>
 
                             <div class="col-md-6 mb-3">
-
-                                <label class="form-label">
-                                    Capacity
-                                </label>
-
+                                <label class="form-label fw-semibold">Capacity</label>
                                 {{ form.capacity }}
+                            </div>
+                        </div>
 
+                        <!-- SIZE + BEDS -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Size (m²)</label>
+                                {{ form.size_m2 }}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Beds</label>
+                                {{ form.beds }}
+                            </div>
+                        </div>
+
+                        <!-- FEATURES -->
+                        <div class="row mb-3">
+
+                            <div class="col-md-4 form-check">
+                                {{ form.has_wifi }}
+                                <label class="form-check-label">WiFi</label>
+                            </div>
+
+                            <div class="col-md-4 form-check">
+                                {{ form.has_breakfast }}
+                                <label class="form-check-label">Breakfast</label>
+                            </div>
+
+                            <div class="col-md-4 form-check">
+                                {{ form.has_air_conditioning }}
+                                <label class="form-check-label">AC</label>
                             </div>
 
                         </div>
 
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Room Type
-                            </label>
-
-                            {{ form.room_type }}
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label class="form-label">
-                                Available
-                            </label>
-
+                        <!-- AVAILABLE -->
+                        <div class="form-check mb-3">
                             {{ form.is_available }}
-
+                            <label class="form-check-label">Available</label>
                         </div>
 
+                        <!-- IMAGE -->
                         <div class="mb-4">
-
-                            <label class="form-label">
-                                Room Image
-                            </label>
-
-                            <input type="file"
-                                   name="image"
-                                   class="form-control">
-
+                            <label class="form-label fw-semibold">Room Image</label>
+                            <input type="file" name="image" class="form-control">
                         </div>
 
-                        <button class="btn btn-success px-4">
+                        <button class="btn btn-success w-100">
                             Save Room
                         </button>
 
                     </form>
 
                 </div>
-
             </div>
 
         </div>

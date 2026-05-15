@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow border-0 mb-4">
+
+        {% if hotel.images.first %}
+
+            <img src="{{ hotel.images.first.image.url }}"
+                 class="card-img-top"
+                 style="height:400px; object-fit:cover;">
+
+        {% endif %}
+
+        <div class="card-body">
+
+            <h1 class="fw-bold">
+                {{ hotel.title }}
+            </h1>
+
+            <p class="text-muted">
+                {{ hotel.city }}
+            </p>
+
+            <p>
+                {{ hotel.description }}
+            </p>
+
+            <p>
+
+                <strong>
+                    Address:
+                </strong>
+
+                {{ hotel.address }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+
+        <div class="card-body">
+
+            <h3 class="mb-4">
+                Search Rooms
+            </h3>
+
+            <form method="GET">
+
+                <div class="row">
+
+                    <div class="col-md-3 mb-2">
+
+                        <select name="type"
+                                class="form-select">
+
+                            <option value="">
+                                Room Type
+                            </option>
+
+                            <option value="single">
+                                Single
+                            </option>
+
+                            <option value="double">
+                                Double
+                            </option>
+
+                            <option value="lux">
+                                Lux
+                            </option>
+
+                            <option value="family">
+                                Family
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-2 mb-2">
+
+                        <input type="number"
+                               name="capacity"
+                               class="form-control"
+                               placeholder="Capacity">
+
+                    </div>
+
+                    <div class="col-md-2 mb-2">
+
+                        <input type="number"
+                               name="min_price"
+                               class="form-control"
+                               placeholder="Min Price">
+
+                    </div>
+
+                    <div class="col-md-2 mb-2">
+
+                        <input type="number"
+                               name="max_price"
+                               class="form-control"
+                               placeholder="Max Price">
+
+                    </div>
+
+                    <div class="col-md-3 mb-2">
+
+                        <button class="btn btn-dark w-100">
+                            Search
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <h2 class="fw-bold mb-4">
+
+        Rooms
+
+    </h2>
+
+    <div class="row">
+
+        {% for room in rooms %}
+
+            <div class="col-md-4 mb-4">
+
+                <div class="card h-100 shadow border-0">
+
+                    {% if room.images.first %}
+
+                        <img src="{{ room.images.first.image.url }}"
+                             class="card-img-top"
+                             style="height:250px; object-fit:cover;">
+
+                    {% endif %}
+
+                    <div class="card-body d-flex flex-column">
+
+                        <h5 class="fw-bold">
+
+                            {{ room.title }}
+
+                        </h5>
+
+                        <p>
+
+                            {{ room.description|truncatewords:15 }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+                                Price:
+                            </strong>
+
+                            ${{ room.price }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+                                Capacity:
+                            </strong>
+
+                            {{ room.capacity }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>
+                                Type:
+                            </strong>
+
+                            {{ room.room_type }}
+
+                        </p>
+
+                        <a href="{% url 'room_detail' room.id %}"
+                           class="btn btn-primary mt-auto">
+
+                            View Room
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        {% empty %}
+
+            <div class="col-12">
+
+                <div class="alert alert-warning">
+
+                    No rooms found.
+
+                </div>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

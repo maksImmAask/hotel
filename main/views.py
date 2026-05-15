@@ -1,23 +1,54 @@
 from datetime import date
+from decimal import Decimal
 
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import logout
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.models import User
+from .forms import HotelForm
+from django.shortcuts import render, redirect, get_object_or_404
 
-from .forms import RoomForm
-from .forms import RegisterForm, BookingForm
-from .models import Room, Booking
-from .models import RoomImage
-from django.contrib.auth.forms import UserCreationForm
+from .forms import (
+    RoomForm,
+    RegisterForm,
+    BookingForm,
+)
+
+from .models import (
+    Hotel,
+    HotelImage,
+    Room,
+    RoomImage,
+    Booking,
+)
 
 
 def home(request):
 
-    rooms = Room.objects.all()
+    hotels = Hotel.objects.all()
+
+    search = request.GET.get('search')
+    city = request.GET.get('city')
+
+    if search:
+        hotels = hotels.filter(title__icontains=search)
+
+    if city:
+        hotels = hotels.filter(city__icontains=city)
+
+    context = {
+        'hotels': hotels
+    }
+
+    return render(request, 'home.html', context)
+
+
+def hotel_detail(request, pk):
+
+    hotel = get_object_or_404(Hotel, id=pk)
+
+    rooms = hotel.rooms.all()
 
     room_type = request.GET.get('type')
     capacity = request.GET.get('capacity')
@@ -37,12 +68,11 @@ def home(request):
         rooms = rooms.filter(price__lte=max_price)
 
     context = {
+        'hotel': hotel,
         'rooms': rooms
     }
 
-    return render(request, 'home.html', context)
-
-
+    return render(request, 'hotel_detail.html', context)
 
 def room_detail(request, pk):
 
@@ -81,23 +111,24 @@ def room_detail(request, pk):
                     form.add_error(None, 'Room already booked for these dates')
 
                 else:
+                    nights = (check_out - check_in).days
+                    total_price = Decimal(nights) * room.price  
+
                     booking = form.save(commit=False)
                     booking.user = request.user
                     booking.room = room
+                    booking.total_price = total_price
                     booking.save()
 
                     return redirect('profile')
 
-    context = {
+    return render(request, 'room_detail.html', {
         'room': room,
         'form': form
-    }
-
-    return render(request, 'room_detail.html', context)
-
-
+    })
 
 def register_view(request):
+
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -108,44 +139,61 @@ def register_view(request):
         form = RegisterForm(request.POST)
 
         if form.is_valid():
+
             user = form.save()
+
             login(request, user)
+
             return redirect('home')
 
-    return render(request, 'register.html', {'form': form})
-
+    return render(request, 'register.html', {
+        'form': form
+    })
 
 
 def login_view(request):
+
     if request.user.is_authenticated:
         return redirect('home')
-    form = AuthenticationForm(data=request.POST or None)
+
+    form = AuthenticationForm(
+        data=request.POST or None
+    )
 
     if request.method == 'POST':
 
         if form.is_valid():
-            login(request, form.get_user())
+
+            login(
+                request,
+                form.get_user()
+            )
+
             return redirect('home')
 
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'login.html', {
+        'form': form
+    })
 
 
 @login_required
 def logout_view(request):
-    logout(request)
-    return redirect('home')
 
+    logout(request)
+
+    return redirect('home')
 
 
 @login_required
 def profile(request):
 
-    bookings = Booking.objects.filter(user=request.user)
+    bookings = Booking.objects.filter(
+        user=request.user
+    )
 
     return render(request, 'profile.html', {
         'bookings': bookings
     })
-
 
 
 @login_required
@@ -158,6 +206,7 @@ def cancel_booking(request, pk):
     )
 
     booking.status = 'cancelled'
+
     booking.save()
 
     return redirect('profile')
@@ -165,11 +214,16 @@ def cancel_booking(request, pk):
 @staff_member_required
 def admin_dashboard(request):
 
+    hotels_count = Hotel.objects.count()
+
     rooms_count = Room.objects.count()
+
     bookings_count = Booking.objects.count()
+
     users_count = User.objects.count()
 
     context = {
+        'hotels_count': hotels_count,
         'rooms_count': rooms_count,
         'bookings_count': bookings_count,
         'users_count': users_count,
@@ -179,13 +233,26 @@ def admin_dashboard(request):
 
 
 @staff_member_required
+def admin_hotels(request):
+
+    hotels = Hotel.objects.all()
+
+    return render(request, 'admin/hotels.html', {
+        'hotels': hotels
+    })
+
+
+@staff_member_required
 def admin_rooms(request):
 
-    rooms = Room.objects.all()
+    rooms = Room.objects.select_related(
+        'hotel'
+    )
 
     return render(request, 'admin/rooms.html', {
         'rooms': rooms
     })
+
 
 @staff_member_required
 def admin_create_room(request):
@@ -206,6 +273,7 @@ def admin_create_room(request):
             image = request.FILES.get('image')
 
             if image:
+
                 RoomImage.objects.create(
                     room=room,
                     image=image
@@ -253,6 +321,7 @@ def admin_edit_room(request, pk):
         'room': room
     })
 
+
 @staff_member_required
 def admin_delete_room(request, pk):
 
@@ -266,17 +335,27 @@ def admin_delete_room(request, pk):
 @staff_member_required
 def admin_bookings(request):
 
-    bookings = Booking.objects.all()
+    bookings = Booking.objects.select_related(
+        'user',
+        'room',
+        'room__hotel'
+    )
 
     return render(request, 'admin/bookings.html', {
         'bookings': bookings
     })
+
+
 @staff_member_required
 def admin_confirm_booking(request, pk):
 
-    booking = get_object_or_404(Booking, id=pk)
+    booking = get_object_or_404(
+        Booking,
+        id=pk
+    )
 
     if booking.status == 'confirmed':
+
         return redirect('admin_bookings')
 
     conflict = Booking.objects.filter(
@@ -287,21 +366,31 @@ def admin_confirm_booking(request, pk):
     ).exclude(id=booking.id).exists()
 
     if conflict:
+
         return redirect('admin_bookings')
 
     booking.status = 'confirmed'
+
     booking.save()
 
     return redirect('admin_bookings')
+
+
 @staff_member_required
 def admin_cancel_booking_panel(request, pk):
 
-    booking = get_object_or_404(Booking, id=pk)
+    booking = get_object_or_404(
+        Booking,
+        id=pk
+    )
 
     booking.status = 'cancelled'
+
     booking.save()
 
     return redirect('admin_bookings')
+
+
 @staff_member_required
 def admin_users(request):
 
@@ -310,6 +399,8 @@ def admin_users(request):
     return render(request, 'admin/users.html', {
         'users': users
     })
+
+
 @staff_member_required
 def admin_create_user(request):
 
@@ -328,16 +419,25 @@ def admin_create_user(request):
     return render(request, 'admin/create_user.html', {
         'form': form
     })
+
+
 @staff_member_required
 def admin_edit_user(request, pk):
 
-    user_item = get_object_or_404(User, id=pk)
+    user_item = get_object_or_404(
+        User,
+        id=pk
+    )
 
     if request.method == 'POST':
 
-        user_item.username = request.POST.get('username')
+        user_item.username = request.POST.get(
+            'username'
+        )
 
-        user_item.email = request.POST.get('email')
+        user_item.email = request.POST.get(
+            'email'
+        )
 
         user_item.is_staff = bool(
             request.POST.get('is_staff')
@@ -350,11 +450,114 @@ def admin_edit_user(request, pk):
     return render(request, 'admin/edit_user.html', {
         'user_item': user_item
     })
+
+
 @staff_member_required
 def admin_delete_user(request, pk):
 
-    user_item = get_object_or_404(User, id=pk)
+    user_item = get_object_or_404(
+        User,
+        id=pk
+    )
 
     user_item.delete()
 
     return redirect('admin_users')
+@staff_member_required
+def admin_hotels(request):
+
+    hotels = Hotel.objects.all()
+
+    return render(request, 'admin/hotels.html', {
+        'hotels': hotels
+    })
+
+
+@staff_member_required
+def admin_create_hotel(request):
+
+    form = HotelForm()
+
+    if request.method == 'POST':
+
+        form = HotelForm(
+            request.POST,
+            request.FILES
+        )
+
+        if form.is_valid():
+
+            hotel = form.save()
+
+            image = request.FILES.get('image')
+
+            if image:
+
+                HotelImage.objects.create(
+                    hotel=hotel,
+                    image=image
+                )
+
+            return redirect('admin_hotels')
+
+    return render(request, 'admin/create_hotel.html', {
+        'form': form
+    })
+
+
+@staff_member_required
+def admin_edit_hotel(request, pk):
+
+    hotel = get_object_or_404(
+        Hotel,
+        id=pk
+    )
+
+    form = HotelForm(instance=hotel)
+
+    if request.method == 'POST':
+
+        form = HotelForm(
+            request.POST,
+            request.FILES,
+            instance=hotel
+        )
+
+        if form.is_valid():
+
+            hotel = form.save()
+
+            image = request.FILES.get('image')
+
+            if image:
+
+                HotelImage.objects.create(
+                    hotel=hotel,
+                    image=image
+                )
+
+            return redirect('admin_hotels')
+
+    return render(request, 'admin/edit_hotel.html', {
+        'form': form,
+        'hotel': hotel
+    })
+
+
+@staff_member_required
+def admin_delete_hotel(request, pk):
+
+    hotel = get_object_or_404(
+        Hotel,
+        id=pk
+    )
+
+    if request.method == 'POST':
+
+        hotel.delete()
+
+        return redirect('admin_hotels')
+
+    return render(request, 'admin/delete_hotel.html', {
+        'hotel': hotel
+    })

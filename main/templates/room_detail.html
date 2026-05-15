@@ -2,41 +2,155 @@
 
 {% block content %}
 
-<div class="row">
+<div class="container mt-4">
 
-    <div class="col-md-6">
+    <div class="row">
 
-        {% for image in room.images.all %}
+        <div class="col-md-6">
 
-            <img src="{{ image.image.url }}"
-                 class="img-fluid rounded mb-3">
+            {% for image in room.images.all %}
 
-        {% endfor %}
+                <img src="{{ image.image.url }}"
+                     class="img-fluid rounded mb-3 shadow-sm">
 
-    </div>
+            {% endfor %}
 
-    <div class="col-md-6">
+        </div>
 
-        <h1>{{ room.title }}</h1>
+        <div class="col-md-6">
 
-        <p>{{ room.description }}</p>
+            <div class="card shadow border-0 p-4">
 
-        <h4>${{ room.price }}</h4>
+                <h1 class="fw-bold">{{ room.title }}</h1>
 
-        <p>Capacity: {{ room.capacity }}</p>
+                <p class="text-muted">
+                    {{ room.description }}
+                </p>
+                <div class="mb-3">
 
-        <form method="POST">
-            {% csrf_token %}
+                    <span class="badge bg-primary">
+                        {{ room.get_room_type_display }}
+                    </span>
 
-            {{ form.as_p }}
+                    <span class="badge bg-dark">
+                        Capacity: {{ room.capacity }}
+                    </span>
 
-            <button class="btn btn-success">
-                Book now
-            </button>
-        </form>
+                    {% if room.size_m2 %}
+                        <span class="badge bg-secondary">
+                            {{ room.size_m2 }} m²
+                        </span>
+                    {% endif %}
+
+                    {% if room.rating %}
+                        <span class="badge bg-warning text-dark">
+                            ⭐ {{ room.rating }}
+                        </span>
+                    {% endif %}
+
+                </div>
+
+                <div class="mb-3">
+
+                    {% if room.has_wifi %}
+                        <span class="badge bg-success">WiFi</span>
+                    {% endif %}
+
+                    {% if room.has_breakfast %}
+                        <span class="badge bg-info text-dark">Breakfast</span>
+                    {% endif %}
+
+                    {% if room.has_air_conditioning %}
+                        <span class="badge bg-primary">AC</span>
+                    {% endif %}
+
+                </div>
+
+                <hr>
+
+                <div class="alert alert-info">
+
+                    <div>
+                        <strong>Price per night:</strong>
+                        ${{ room.price }}
+                    </div>
+
+                    <div>
+                        <strong>Nights:</strong>
+                        <span id="nights">0</span>
+                    </div>
+
+                    <div>
+                        <strong>Total price:</strong>
+                        $<span id="total">0</span>
+                    </div>
+
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Check in</label>
+                        <input type="date"
+                               name="check_in"
+                               id="check_in"
+                               class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Check out</label>
+                        <input type="date"
+                               name="check_out"
+                               id="check_out"
+                               class="form-control">
+                    </div>
+
+                    <button class="btn btn-success w-100">
+                        Book now
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
 
     </div>
 
 </div>
+
+<script>
+    const pricePerNight = Number("{{ room.price }}");
+
+    const checkIn = document.getElementById("check_in");
+    const checkOut = document.getElementById("check_out");
+
+    const nightsEl = document.getElementById("nights");
+    const totalEl = document.getElementById("total");
+
+    function calculate() {
+        const inDate = new Date(checkIn.value);
+        const outDate = new Date(checkOut.value);
+
+        if (checkIn.value && checkOut.value && outDate > inDate) {
+
+            const diffTime = outDate - inDate;
+            const nights = diffTime / (1000 * 60 * 60 * 24);
+
+            const total = nights * pricePerNight;
+
+            nightsEl.textContent = nights;
+            totalEl.textContent = total.toFixed(2);
+
+        } else {
+            nightsEl.textContent = 0;
+            totalEl.textContent = 0;
+        }
+    }
+
+    checkIn.addEventListener("change", calculate);
+    checkOut.addEventListener("change", calculate);
+</script>
 
 {% endblock %}

@@ -2,18 +2,62 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class Hotel(models.Model):
+
+    title = models.CharField(max_length=255)
+
+    description = models.TextField()
+
+    address = models.CharField(max_length=255)
+
+    city = models.CharField(max_length=100)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class HotelImage(models.Model):
+
+    hotel = models.ForeignKey(
+        Hotel,
+        on_delete=models.CASCADE,
+        related_name='images'
+    )
+
+    image = models.ImageField(upload_to='hotels/')
+
+    def __str__(self):
+        return f"Image for {self.hotel.title}"
+
 class Room(models.Model):
 
     ROOM_TYPES = (
-        ('single', 'Single'),
-        ('double', 'Double'),
+        ('economy', 'Economy'),
+        ('standard', 'Standard'),
+        ('comfort', 'Comfort'),
+        ('deluxe', 'Deluxe'),
         ('lux', 'Lux'),
-        ('family', 'Family'),
+        ('full_lux', 'Full Lux'),
+        ('presidential', 'Presidential'),
+    )
+
+    hotel = models.ForeignKey(
+        Hotel,
+        on_delete=models.CASCADE,
+        related_name='rooms'
     )
 
     title = models.CharField(max_length=255)
 
     description = models.TextField()
+
+    room_type = models.CharField(
+        max_length=20,
+        choices=ROOM_TYPES,
+        default='standard'
+    )
 
     price = models.DecimalField(
         max_digits=10,
@@ -22,19 +66,28 @@ class Room(models.Model):
 
     capacity = models.PositiveIntegerField()
 
-    room_type = models.CharField(
-        max_length=20,
-        choices=ROOM_TYPES
-    )
+    size_m2 = models.PositiveIntegerField(null=True, blank=True)
+
+    beds = models.PositiveIntegerField(default=1)
+
+    has_wifi = models.BooleanField(default=True)
+
+    has_breakfast = models.BooleanField(default=False)
+
+    has_air_conditioning = models.BooleanField(default=True)
 
     is_available = models.BooleanField(default=True)
+
+    rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        default=4.0
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
-
-
+        return f"{self.hotel.title} - {self.title}"
 class RoomImage(models.Model):
 
     room = models.ForeignKey(
@@ -48,7 +101,6 @@ class RoomImage(models.Model):
     def __str__(self):
         return f"Image for {self.room.title}"
 
-
 class Booking(models.Model):
 
     BOOKING_STATUS = (
@@ -57,27 +109,19 @@ class Booking(models.Model):
         ('cancelled', 'Cancelled'),
     )
 
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='bookings'
-    )
-
-    room = models.ForeignKey(
-        Room,
-        on_delete=models.CASCADE,
-        related_name='bookings'
-    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='bookings')
 
     check_in = models.DateField()
-
     check_out = models.DateField()
 
-    status = models.CharField(
-        max_length=20,
-        choices=BOOKING_STATUS,
-        default='pending'
+    total_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0
     )
+
+    status = models.CharField(max_length=20, choices=BOOKING_STATUS, default='pending')
 
     created_at = models.DateTimeField(auto_now_add=True)
 

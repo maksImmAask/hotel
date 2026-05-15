@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
 from .models import Booking, Room, RoomImage
-
+from .models import Hotel
 
 class RegisterForm(UserCreationForm):
 
@@ -102,6 +102,31 @@ class RoomImageForm(forms.ModelForm):
             }),
 
             'image': forms.ClearableFileInput(attrs={
+                'class': 'form-control'
+            }),
+        }
+class HotelForm(forms.ModelForm):
+
+    class Meta:
+        model = Hotel
+        fields = '__all__'
+
+        widgets = {
+
+            'title': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 5
+            }),
+
+            'address': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+
+            'city': forms.TextInput(attrs={
                 'class': 'form-control'
             }),
         }
