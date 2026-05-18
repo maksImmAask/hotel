@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="card shadow border-0">
+
+                <div class="card-body p-4">
+
+                    <h2 class="fw-bold mb-4">
+                        Create Guest
+                    </h2>
+
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- Booking -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">
+                                Booking
+                            </label>
+
+                            <select name="booking_id" class="form-select form-select-lg" required>
+                                <option disabled selected>Select booking</option>
+
+                                {% for booking in bookings %}
+                                    <option value="{{ booking.id }}">
+                                        {{ booking.user.username }} — {{ booking.room.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Names -->
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <input type="text"
+                                       name="first_name"
+                                       class="form-control"
+                                       placeholder="First name"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text"
+                                       name="last_name"
+                                       class="form-control"
+                                       placeholder="Last name"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text"
+                                       name="passport_number"
+                                       class="form-control"
+                                       placeholder="Passport number"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text"
+                                       name="national_id"
+                                       class="form-control"
+                                       placeholder="National ID"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text"
+                                       name="phone_number"
+                                       class="form-control"
+                                       placeholder="Phone number"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <input type="text"
+                                       name="citizenship"
+                                       class="form-control"
+                                       placeholder="Citizenship"
+                                       required>
+                            </div>
+
+                            <div class="col-md-12">
+                                <input type="date"
+                                       name="birth_date"
+                                       class="form-control"
+                                       required>
+                            </div>
+
+                        </div>
+
+                        <!-- Button -->
+                        <div class="mt-4 d-flex justify-content-end">
+                            <button class="btn btn-success px-4">
+                                Create Guest
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

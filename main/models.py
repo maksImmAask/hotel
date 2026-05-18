@@ -31,6 +31,7 @@ class HotelImage(models.Model):
     def __str__(self):
         return f"Image for {self.hotel.title}"
 
+
 class Room(models.Model):
 
     ROOM_TYPES = (
@@ -66,7 +67,10 @@ class Room(models.Model):
 
     capacity = models.PositiveIntegerField()
 
-    size_m2 = models.PositiveIntegerField(null=True, blank=True)
+    size_m2 = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
 
     beds = models.PositiveIntegerField(default=1)
 
@@ -88,6 +92,8 @@ class Room(models.Model):
 
     def __str__(self):
         return f"{self.hotel.title} - {self.title}"
+
+
 class RoomImage(models.Model):
 
     room = models.ForeignKey(
@@ -101,6 +107,7 @@ class RoomImage(models.Model):
     def __str__(self):
         return f"Image for {self.room.title}"
 
+
 class Booking(models.Model):
 
     BOOKING_STATUS = (
@@ -109,10 +116,20 @@ class Booking(models.Model):
         ('cancelled', 'Cancelled'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='bookings')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )
+
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.CASCADE,
+        related_name='bookings'
+    )
 
     check_in = models.DateField()
+
     check_out = models.DateField()
 
     total_price = models.DecimalField(
@@ -121,9 +138,36 @@ class Booking(models.Model):
         default=0
     )
 
-    status = models.CharField(max_length=20, choices=BOOKING_STATUS, default='pending')
+    status = models.CharField(
+        max_length=20,
+        choices=BOOKING_STATUS,
+        default='pending'
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.room.title}"
+
+class Guest(models.Model):
+
+    booking = models.ForeignKey(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name='guests'
+    )
+
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
+
+    passport_number = models.CharField(max_length=100)
+    national_id = models.CharField(max_length=100)
+
+    phone_number = models.CharField(max_length=30, blank=True, null=True)
+    citizenship = models.CharField(max_length=100)
+    birth_date = models.DateField()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"

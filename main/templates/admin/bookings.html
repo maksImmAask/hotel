@@ -36,7 +36,7 @@
                             <th>Check In</th>
                             <th>Check Out</th>
                             <th>Status</th>
-                            <th width="260">Actions</th>
+                            <th width="300">Actions</th>
                         </tr>
 
                     </thead>
@@ -120,6 +120,13 @@
                                             </button>
 
                                         {% endif %}
+
+                                        <!-- DELETE BOOKING -->
+                                        <a href="{% url 'admin_delete_booking' booking.id %}"
+                                           class="btn btn-dark btn-sm"
+                                           onclick="return confirm('Are you sure you want to delete this booking?')">
+                                            Delete
+                                        </a>
 
                                     </div>
 

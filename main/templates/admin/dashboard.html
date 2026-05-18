@@ -118,38 +118,44 @@
             <h4 class="fw-bold mb-4">
                 Management
             </h4>
+<div class="d-flex flex-wrap gap-3">
 
-            <div class="d-flex flex-wrap gap-3">
+    <a href="{% url 'admin_hotels' %}"
+       class="btn btn-dark px-4">
 
-                <a href="{% url 'admin_hotels' %}"
-                   class="btn btn-dark px-4">
+        Hotels
 
-                    Hotels
+    </a>
 
-                </a>
+    <a href="{% url 'admin_rooms' %}"
+       class="btn btn-primary px-4">
 
-                <a href="{% url 'admin_rooms' %}"
-                   class="btn btn-primary px-4">
+        Rooms
 
-                    Rooms
+    </a>
 
-                </a>
+    <a href="{% url 'admin_bookings' %}"
+       class="btn btn-success px-4">
 
-                <a href="{% url 'admin_bookings' %}"
-                   class="btn btn-success px-4">
+        Bookings
 
-                    Bookings
+    </a>
 
-                </a>
+    <a href="{% url 'admin_users' %}"
+       class="btn btn-warning px-4">
 
-                <a href="{% url 'admin_users' %}"
-                   class="btn btn-warning px-4">
+        Users
 
-                    Users
+    </a>
 
-                </a>
+    <a href="{% url 'admin_booking_guests' %}"
+       class="btn btn-info px-4">
 
-            </div>
+        Guests
+
+    </a>
+
+</div>
 
         </div>
 

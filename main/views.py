@@ -14,15 +14,14 @@ from .forms import (
     RegisterForm,
     BookingForm,
 )
-
 from .models import (
     Hotel,
     HotelImage,
     Room,
     RoomImage,
     Booking,
+    Guest
 )
-
 
 def home(request):
 
@@ -73,7 +72,6 @@ def hotel_detail(request, pk):
     }
 
     return render(request, 'hotel_detail.html', context)
-
 def room_detail(request, pk):
 
     room = get_object_or_404(Room, id=pk)
@@ -85,40 +83,52 @@ def room_detail(request, pk):
         if not request.user.is_authenticated:
             return redirect('login')
 
-        form = BookingForm(request.POST)
+        if not room.is_available:
 
-        if form.is_valid():
+            form.add_error(
+                None,
+                'This room is already booked'
+            )
 
-            check_in = form.cleaned_data['check_in']
-            check_out = form.cleaned_data['check_out']
+        else:
 
-            if check_in < date.today():
-                form.add_error('check_in', 'Past date is not allowed')
+            form = BookingForm(request.POST)
 
-            elif check_out <= check_in:
-                form.add_error('check_out', 'Check-out must be after check-in')
+            if form.is_valid():
 
-            else:
+                check_in = form.cleaned_data['check_in']
+                check_out = form.cleaned_data['check_out']
 
-                conflict = Booking.objects.filter(
-                    room=room,
-                    status='confirmed',
-                    check_in__lt=check_out,
-                    check_out__gt=check_in
-                ).exists()
+                if check_in < date.today():
 
-                if conflict:
-                    form.add_error(None, 'Room already booked for these dates')
+                    form.add_error(
+                        'check_in',
+                        'Past date is not allowed'
+                    )
+
+                elif check_out <= check_in:
+
+                    form.add_error(
+                        'check_out',
+                        'Check-out must be after check-in'
+                    )
 
                 else:
+
                     nights = (check_out - check_in).days
-                    total_price = Decimal(nights) * room.price  
+
+                    total_price = Decimal(nights) * room.price
 
                     booking = form.save(commit=False)
+
                     booking.user = request.user
                     booking.room = room
                     booking.total_price = total_price
+
                     booking.save()
+
+                    room.is_available = False
+                    room.save()
 
                     return redirect('profile')
 
@@ -561,3 +571,143 @@ def admin_delete_hotel(request, pk):
     return render(request, 'admin/delete_hotel.html', {
         'hotel': hotel
     })
+@staff_member_required
+def admin_create_guest(request):
+
+    bookings = Booking.objects.all()
+
+    if request.method == 'POST':
+
+        booking = get_object_or_404(
+            Booking,
+            id=request.POST.get('booking_id')
+        )
+
+        current_count = Guest.objects.filter(booking=booking).count()
+
+        if current_count >= booking.room.capacity:
+            return redirect('admin_booking_guests')
+
+        Guest.objects.create(
+            booking=booking,
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'),
+            passport_number=request.POST.get('passport_number'),
+            national_id=request.POST.get('national_id'),
+            phone_number=request.POST.get('phone_number'),
+            citizenship=request.POST.get('citizenship'),
+            birth_date=request.POST.get('birth_date'),
+            is_main_guest=False
+        )
+
+        return redirect('admin_booking_guests')
+
+    return render(request, 'admin/create_guest.html', {
+        'bookings': bookings
+    })
+
+@staff_member_required
+def admin_booking_guests(request):
+
+    bookings = Booking.objects.select_related('room', 'user')
+
+    if request.method == 'POST':
+
+        booking_id = request.POST.get('booking_id')
+        booking = get_object_or_404(Booking, id=booking_id)
+
+        current_count = Guest.objects.filter(booking=booking).count()
+
+        if current_count >= booking.room.capacity:
+            return redirect('admin_booking_guests')
+
+        Guest.objects.create(
+            booking=booking,
+            first_name=request.POST.get('first_name'),
+            last_name=request.POST.get('last_name'),
+            passport_number=request.POST.get('passport_number'),
+            national_id=request.POST.get('national_id'),
+            phone_number=request.POST.get('phone_number'),
+            citizenship=request.POST.get('citizenship'),
+            birth_date=request.POST.get('birth_date'),
+            is_main_guest=False
+        )
+
+        return redirect('admin_booking_guests')
+
+    return render(request, 'admin/guests.html', {
+        'bookings': bookings,
+        'guests': Guest.objects.select_related('booking')
+    })
+@staff_member_required
+def admin_edit_guest(request, pk):
+
+    guest = get_object_or_404(
+        Guest,
+        id=pk
+    )
+
+    if request.method == 'POST':
+
+        guest.full_name = request.POST.get(
+            'full_name'
+        )
+
+        guest.passport_number = request.POST.get(
+            'passport_number'
+        )
+
+        guest.national_id = request.POST.get(
+            'national_id'
+        )
+
+        guest.birth_date = request.POST.get(
+            'birth_date'
+        )
+
+        guest.citizenship = request.POST.get(
+            'citizenship'
+        )
+
+        guest.save()
+
+        return redirect(
+            'admin_booking_guests',
+            pk=guest.booking.id
+        )
+
+    return render(request, 'admin/edit_guest.html', {
+        'guest': guest
+    })
+@staff_member_required
+def admin_delete_guest(request, pk):
+
+    guest = get_object_or_404(
+        Guest,
+        id=pk
+    )
+
+    booking_id = guest.booking.id
+
+    guest.delete()
+
+    return redirect(
+        'admin_booking_guests',
+        pk=booking_id
+    )
+@staff_member_required
+def admin_delete_booking(request, pk):
+
+    booking = get_object_or_404(
+        Booking,
+        id=pk
+    )
+
+    # вернуть комнату в доступные (очень важно)
+    room = booking.room
+    room.is_available = True
+    room.save()
+
+    booking.delete()
+
+    return redirect('admin_bookings')
