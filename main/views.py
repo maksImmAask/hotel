@@ -582,7 +582,7 @@ def admin_create_guest(request):
         current_count = Guest.objects.filter(booking=booking).count()
 
         if current_count >= booking.room.capacity:
-            return redirect('admin_booking_guests')
+            return redirect('admin_bookings')
 
         Guest.objects.create(
             booking=booking,
