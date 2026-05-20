@@ -40,6 +40,7 @@
                             <th>Price</th>
                             <th>Capacity</th>
                             <th>Type</th>
+                            <th>Bed Type</th>
                             <th>Status</th>
                             <th class="text-center">Actions</th>
                         </tr>
@@ -98,6 +99,12 @@
                                 <td>
                                     <span class="badge bg-info text-dark">
                                         {{ room.get_room_type_display }}
+                                    </span>
+                                </td>
+                                <!-- BED TYPE -->
+                                <td>
+                                    <span class="badge bg-warning text-dark">
+                                        {{ room.get_bed_type_display }}
                                     </span>
                                 </td>
 

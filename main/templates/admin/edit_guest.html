@@ -8,7 +8,7 @@
 
         <div class="col-md-8">
 
-            <div class="card border-0 shadow">
+            <div class="card border-0 shadow rounded-4">
 
                 <div class="card-body p-4">
 
@@ -20,9 +20,131 @@
 
                         {% csrf_token %}
 
-                        {{ form.as_p }}
+                        <div class="mb-3">
 
-                        <button class="btn btn-primary">
+                            <label class="form-label fw-semibold">
+                                Booking
+                            </label>
+
+                            <select name="booking_id"
+                                    class="form-select">
+
+                                {% for booking in bookings %}
+
+                                    <option value="{{ booking.id }}"
+                                        {% if booking.id == guest.booking.id %}
+                                            selected
+                                        {% endif %}
+                                    >
+
+                                        {{ booking.user.username }}
+                                        -
+                                        {{ booking.room.title }}
+
+                                    </option>
+
+                                {% endfor %}
+
+                            </select>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    First Name
+                                </label>
+
+                                <input type="text"
+                                       name="first_name"
+                                       class="form-control"
+                                       value="{{ guest.first_name }}">
+
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+
+                                <label class="form-label fw-semibold">
+                                    Last Name
+                                </label>
+
+                                <input type="text"
+                                       name="last_name"
+                                       class="form-control"
+                                       value="{{ guest.last_name }}">
+
+                            </div>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Passport Number
+                            </label>
+
+                            <input type="text"
+                                   name="passport_number"
+                                   class="form-control"
+                                   value="{{ guest.passport_number }}">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                National ID
+                            </label>
+
+                            <input type="text"
+                                   name="national_id"
+                                   class="form-control"
+                                   value="{{ guest.national_id }}">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Phone Number
+                            </label>
+
+                            <input type="text"
+                                   name="phone_number"
+                                   class="form-control"
+                                   value="{{ guest.phone_number }}">
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">
+                                Citizenship
+                            </label>
+
+                            <input type="text"
+                                   name="citizenship"
+                                   class="form-control"
+                                   value="{{ guest.citizenship }}">
+
+                        </div>
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                Birth Date
+                            </label>
+
+                            <input type="date"
+                                   name="birth_date"
+                                   class="form-control"
+                                   value="{{ guest.birth_date|date:'Y-m-d' }}">
+
+                        </div>
+
+                        <button class="btn btn-primary px-4 rounded-pill">
                             Save Changes
                         </button>
 

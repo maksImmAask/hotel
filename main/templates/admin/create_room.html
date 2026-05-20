@@ -61,19 +61,23 @@
                             </div>
                         </div>
 
-                        <!-- SIZE + BEDS -->
+                        <!-- SIZE + BEDS + BED TYPE -->
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold">Size (m²)</label>
                                 {{ form.size_m2 }}
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold">Beds</label>
                                 {{ form.beds }}
                             </div>
-                        </div>
 
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Bed Type</label>
+                                {{ form.bed_type }}
+                            </div>
+                        </div>
                         <!-- FEATURES -->
                         <div class="row mb-3">
 
@@ -102,8 +106,11 @@
 
                         <!-- IMAGE -->
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Room Image</label>
-                            <input type="file" name="image" class="form-control">
+                            <label class="form-label fw-semibold">Room Images</label>
+                            <input type="file"
+                                name="images"
+                                class="form-control"
+                                multiple>
                         </div>
 
                         <button class="btn btn-success w-100">

@@ -275,15 +275,13 @@ def admin_create_room(request):
             request.POST,
             request.FILES
         )
-
         if form.is_valid():
 
             room = form.save()
 
-            image = request.FILES.get('image')
+            images = request.FILES.getlist('images')
 
-            if image:
-
+            for image in images:
                 RoomImage.objects.create(
                     room=room,
                     image=image
@@ -315,10 +313,9 @@ def admin_edit_room(request, pk):
 
             room = form.save()
 
-            image = request.FILES.get('image')
+            images = request.FILES.getlist('images')
 
-            if image:
-
+            for image in images:
                 RoomImage.objects.create(
                     room=room,
                     image=image
@@ -341,7 +338,6 @@ def admin_delete_room(request, pk):
 
     return redirect('admin_rooms')
 
-
 @staff_member_required
 def admin_bookings(request):
 
@@ -349,13 +345,13 @@ def admin_bookings(request):
         'user',
         'room',
         'room__hotel'
+    ).prefetch_related(
+        'guests'
     )
 
     return render(request, 'admin/bookings.html', {
         'bookings': bookings
     })
-
-
 @staff_member_required
 def admin_confirm_booking(request, pk):
 
@@ -596,48 +592,12 @@ def admin_create_guest(request):
             national_id=request.POST.get('national_id'),
             phone_number=request.POST.get('phone_number'),
             citizenship=request.POST.get('citizenship'),
-            birth_date=request.POST.get('birth_date'),
-            is_main_guest=False
+            birth_date=request.POST.get('birth_date')
         )
-
-        return redirect('admin_booking_guests')
+        return redirect('admin_bookings')
 
     return render(request, 'admin/create_guest.html', {
         'bookings': bookings
-    })
-
-@staff_member_required
-def admin_booking_guests(request):
-
-    bookings = Booking.objects.select_related('room', 'user')
-
-    if request.method == 'POST':
-
-        booking_id = request.POST.get('booking_id')
-        booking = get_object_or_404(Booking, id=booking_id)
-
-        current_count = Guest.objects.filter(booking=booking).count()
-
-        if current_count >= booking.room.capacity:
-            return redirect('admin_booking_guests')
-
-        Guest.objects.create(
-            booking=booking,
-            first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'),
-            passport_number=request.POST.get('passport_number'),
-            national_id=request.POST.get('national_id'),
-            phone_number=request.POST.get('phone_number'),
-            citizenship=request.POST.get('citizenship'),
-            birth_date=request.POST.get('birth_date'),
-            is_main_guest=False
-        )
-
-        return redirect('admin_booking_guests')
-
-    return render(request, 'admin/guests.html', {
-        'bookings': bookings,
-        'guests': Guest.objects.select_related('booking')
     })
 @staff_member_required
 def admin_edit_guest(request, pk):
@@ -649,8 +609,16 @@ def admin_edit_guest(request, pk):
 
     if request.method == 'POST':
 
-        guest.full_name = request.POST.get(
-            'full_name'
+        guest.booking_id = request.POST.get(
+            'booking_id'
+        )
+
+        guest.first_name = request.POST.get(
+            'first_name'
+        )
+
+        guest.last_name = request.POST.get(
+            'last_name'
         )
 
         guest.passport_number = request.POST.get(
@@ -661,23 +629,25 @@ def admin_edit_guest(request, pk):
             'national_id'
         )
 
-        guest.birth_date = request.POST.get(
-            'birth_date'
+        guest.phone_number = request.POST.get(
+            'phone_number'
         )
 
         guest.citizenship = request.POST.get(
             'citizenship'
         )
 
-        guest.save()
-
-        return redirect(
-            'admin_booking_guests',
-            pk=guest.booking.id
+        guest.birth_date = request.POST.get(
+            'birth_date'
         )
 
+        guest.save()
+
+        return redirect('admin_bookings')
+
     return render(request, 'admin/edit_guest.html', {
-        'guest': guest
+        'guest': guest,
+        'bookings': Booking.objects.all()
     })
 @staff_member_required
 def admin_delete_guest(request, pk):
@@ -687,14 +657,9 @@ def admin_delete_guest(request, pk):
         id=pk
     )
 
-    booking_id = guest.booking.id
-
     guest.delete()
 
-    return redirect(
-        'admin_booking_guests',
-        pk=booking_id
-    )
+    return redirect('admin_bookings')
 @staff_member_required
 def admin_delete_booking(request, pk):
 

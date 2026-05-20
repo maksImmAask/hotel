@@ -35,6 +35,15 @@
                     <span class="badge bg-dark">
                         Capacity: {{ room.capacity }}
                     </span>
+                    <p>
+                    <strong>Beds:</strong>
+                        {{ room.beds }}
+                    </p>
+
+                    <p>
+                        <strong>Bed Type:</strong>
+                        {{ room.get_bed_type_display }}
+                    </p>
 
                     {% if room.size_m2 %}
                         <span class="badge bg-secondary">

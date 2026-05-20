@@ -71,8 +71,19 @@ class Room(models.Model):
         null=True,
         blank=True
     )
-
+    BED_TYPES = (
+        ('single', 'Single'),
+        ('double', 'Double'),
+        ('triple', 'Triple'),
+        ('queen (1 big bed for 1 person)', 'Queen (1 big bed for 1 person)'),
+        ('king (bed for 4 people)', 'King (bed for 4 people)'),
+    )
     beds = models.PositiveIntegerField(default=1)
+    bed_type = models.CharField(
+        max_length=50,
+        choices=BED_TYPES,
+        default='single'
+    )
 
     has_wifi = models.BooleanField(default=True)
 

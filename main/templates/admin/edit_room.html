@@ -61,16 +61,21 @@
                             </div>
                         </div>
 
-                        <!-- SIZE + BEDS -->
+                        <!-- SIZE + BEDS + BED TYPE -->
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold">Size (m²)</label>
                                 {{ form.size_m2 }}
                             </div>
 
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold">Beds</label>
                                 {{ form.beds }}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Bed Type</label>
+                                {{ form.bed_type }}
                             </div>
                         </div>
 
@@ -112,9 +117,25 @@
                         {% endif %}
 
                         <!-- NEW IMAGE -->
+                         {% if room.images.all %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Current Images</label>
+
+                                <div class="d-flex flex-wrap gap-2">
+                                    {% for img in room.images.all %}
+                                        <img src="{{ img.image.url }}"
+                                            width="120"
+                                            class="rounded border shadow-sm">
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Change Image</label>
-                            <input type="file" name="image" class="form-control">
+                            <label class="form-label fw-semibold">Room Images</label>
+                            <input type="file"
+                                name="images"
+                                class="form-control"
+                                multiple>
                         </div>
 
                         <div class="d-flex gap-2">

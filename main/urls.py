@@ -1,7 +1,6 @@
 from django.urls import path
 
 from .views import (
-    admin_booking_guests,
     admin_create_guest,
     admin_create_hotel,
     admin_delete_booking,
@@ -57,7 +56,6 @@ urlpatterns = [
     path('admin-panel/hotels/create/', admin_create_hotel, name='admin_create_hotel'),
     path('admin-panel/hotels/edit/<int:pk>/', admin_edit_hotel, name='admin_edit_hotel'),
     path('admin-panel/hotels/delete/<int:pk>/', admin_delete_hotel, name='admin_delete_hotel'),
-    path('admin-panel/guests/', admin_booking_guests, name='admin_booking_guests'),
     path('admin-panel/guests/create/', admin_create_guest, name='admin_create_guest'),
     path(
         'admin-panel/guests/<int:pk>/edit/',
