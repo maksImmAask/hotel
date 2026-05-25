@@ -1,6 +1,6 @@
 from datetime import date
 from decimal import Decimal
-
+from datetime import datetime
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
@@ -676,3 +676,46 @@ def admin_delete_booking(request, pk):
     booking.delete()
 
     return redirect('admin_bookings')
+@login_required
+def extend_booking(request, pk):
+
+    old_booking = get_object_or_404(
+        Booking,
+        id=pk,
+        user=request.user
+    )
+
+    if request.method == 'POST':
+
+        new_check_out = datetime.strptime(
+            request.POST.get('check_out'),
+            '%Y-%m-%d'
+        ).date()
+
+        new_booking = Booking.objects.create(
+            user=old_booking.user,
+            room=old_booking.room,
+            check_in=old_booking.check_out,
+            check_out=new_check_out,
+            total_price=old_booking.total_price,
+            status='pending'
+        )
+
+        for guest in old_booking.guests.all():
+
+            Guest.objects.create(
+                booking=new_booking,
+                first_name=guest.first_name,
+                last_name=guest.last_name,
+                passport_number=guest.passport_number,
+                national_id=guest.national_id,
+                phone_number=guest.phone_number,
+                citizenship=guest.citizenship,
+                birth_date=guest.birth_date
+            )
+
+        return redirect('profile')
+
+    return render(request, 'extend_booking.html', {
+        'booking': old_booking
+    })

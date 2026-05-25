@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-6">
+
+            <div class="card shadow border-0 rounded-4">
+
+                <div class="card-body p-4">
+
+                    <h2 class="fw-bold mb-4">
+                        Extend Booking
+                    </h2>
+
+                    <div class="mb-3">
+                        <strong>Room:</strong>
+                        {{ booking.room.title }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Current stay:</strong>
+                        {{ booking.check_in }} — {{ booking.check_out }}
+                    </div>
+
+                    <div class="mb-4">
+                        <strong>Total Price:</strong>
+
+                        <span class="badge bg-success fs-6">
+                            ${{ booking.total_price }}
+                        </span>
+                    </div>
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold">
+                                New Check Out Date
+                            </label>
+
+                            <input type="date"
+                                   name="check_out"
+                                   class="form-control"
+                                   required>
+
+                            <div class="form-text">
+                                Check-in date will automatically start from
+                                {{ booking.check_out }}
+                            </div>
+
+                        </div>
+
+                        <button class="btn btn-primary px-4">
+                            Extend Booking
+                        </button>
+
+                        <a href="{% url 'profile' %}"
+                           class="btn btn-outline-secondary">
+                            Back
+                        </a>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

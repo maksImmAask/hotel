@@ -9,6 +9,7 @@ from .views import (
     admin_edit_guest,
     admin_edit_hotel,
     admin_hotels,
+    extend_booking,
     home,
     hotel_detail,
     room_detail,
@@ -72,5 +73,10 @@ urlpatterns = [
         'admin-panel/bookings/delete/<int:pk>/',
         admin_delete_booking,
         name='admin_delete_booking'
+    ),
+    path(
+        'booking/<int:pk>/extend/',
+        extend_booking,
+        name='extend_booking'
     ),
 ]
